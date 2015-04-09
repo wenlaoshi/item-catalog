@@ -1,0 +1,100 @@
+{% extends "shared_layout.html" %}
+{% block body %}
+  <!-- Subtitle -->
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3 text-center divider">
+      <h2><i class="fa fa-cutlery"></i>&nbsp;{{restaurant.name}}: <span class="lb-subhead">Restaurant Menu</span></h2>
+      <div class = 'lbr-details'>{{restaurant.address}}</div>
+      <div class = 'lbr-details'>{{restaurant.telephone}}</div>
+      <div class = 'lbr-details'>{{restaurant.hours}}</div>
+      <div class = 'lbr-category'>{{restaurant.category}}</div>
+      {% if restaurant.rating %}
+      <div class = 'lbr-rating'>
+        {% for n in range(5) %}
+          {% if restaurant.rating > n %} <i class="fa fa-star"></i> 
+          {% else %} <i class="fa fa-star-o"></i> 
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% if restaurant.price_range %}
+      <div class = 'lbr-rating'>
+        {% for n in range(restaurant.price_range) %}
+          <i class="fa fa-usd"></i>
+        {% endfor %}
+      </div>
+      {% endif %}
+      <div class = 'lbr-description'>{{restaurant.description}}</div>
+
+      <div class="text-right">
+        <a class="btn btn-sm btn-primary" href="{{url_for('showRestaurants')}}">Restaurants</a>
+        {% if session.email %}
+        <a class="btn btn-sm btn-primary" href="{{url_for('newMenuItem', restaurant_id = restaurant.id)}}">New Item</a>
+        {% endif %}
+      </div>
+    </div>
+  </div><!-- End Subtitle Row -->
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %} 
+  <!-- Messages -->
+  <div class="row">
+    <div class = "col-md-6 col-md-offset-3">
+      {% for message in messages %}
+      <p class = "flash"><i class="fa fa-check-circle-o"></i> {{ message }}</p>
+      {% endfor %}
+    </div>
+  </div><!-- End Messages Row -->
+      {% endif %}
+  {% endwith %}
+
+  <!-- Display Menu Items -->
+  <div class="row">
+{# from Jinja website http://jinja.pocoo.org/docs/dev/templates/ #}
+{% for item in items %}
+    <div class="col-sm-6 col-md-4">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <div class = 'lbr-name'>{{item.name}}</div>
+          <div class = 'lbr-category'>
+            {{item.course}}
+          </div>
+          <div class = 'lbr-item-image'>
+            <img src="{{item.image_url}}" alt="" class="img-responsive img-thumbnail" />
+          </div>
+          <div class = 'lbr-description'>{{item.description}}</div>
+          <div class = 'lbr-price'>${{item.price}}</div>
+          <div class = 'lbr-calories'>{{item.calories}} calories</div>
+         {% if session.email %}
+         <div class="text-right">
+            <a class="btn btn-sm btn-primary" href="{{url_for('editMenuItem', restaurant_id = restaurant.id, menu_id = item.id)}}" >Edit</a>
+            <a class="btn btn-sm btn-danger" href="{{url_for('deleteMenuItem', restaurant_id = restaurant.id, menu_id = item.id)}}" >Delete</a>
+          </div>
+        {% endif %}
+        </div>
+      </div>
+    </div><!-- End Col -->
+{% else %}
+    <div class="col-md-6 col-md-offset-3 text-center">
+      <p>There are currently no items in this menu.</p>
+    </div>
+{% endfor %}
+  </div><!-- End Display Row -->
+
+  <!-- Map -->
+  <div class="row">
+    <div id="map"></div>
+  </div><!-- End Map Row -->
+{% endblock %}
+{% block more_scripts %}
+<!-- Google Maps API Key -->
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBP1Gq6qibeHQbpTNfm7DY07FcUZ-zK3Ew&sensor=false"></script>
+
+<!-- Custom Map JavaScript -->
+<script type="text/javascript">
+  // Latitude, Longitude string for Google Map location
+  var coordinates = "{{restaurant.latlng}}";
+  var restaurant_name = "{{restaurant.name}}";
+</script>
+<script src="{{url_for('static', filename='map.js')}}"></script>
+{% endblock %}
