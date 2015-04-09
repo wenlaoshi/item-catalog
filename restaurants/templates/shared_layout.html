@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset='utf-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <meta name='description' content='Getting to know Long Beach restaurants one dish at a time.'>
+  <meta name='author' content='Jeff Winters'>
+  <title>Long Beach Restaurants</title>
+
+  <!-- Bootstrap Core CSS -->
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+  <!-- Custom CSS -->
+  <link rel=stylesheet type=text/css href="{{url_for('static', filename='styles.css')}}">
+
+  <!-- Custom Fonts -->
+  <link href='//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css' rel='stylesheet' />
+  <link href='http://fonts.googleapis.com/css?family=Allura' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Muli:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Qwigley' rel='stylesheet' type='text/css'>
+  
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+    <script src='https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js'></script>
+    <script src='https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js'></script>
+  <![endif]-->
+</head>
+<body>
+<div class="container-fluid">
+  <!-- Title Header -->
+  <div class="row lb-header">
+    <div id="persona-btn">
+        {% if session.email %}
+        <span id="signout"><img src="http://people.mozilla.org/~smartell/persona/assets/persona-logo.png" alt="" />SIGN OUT</span>
+        {% else %}
+        <span id="signin"><img src="http://people.mozilla.org/~smartell/persona/assets/persona-logo.png" alt="" />SIGN IN</span>
+        {% endif %}
+    </div>
+    <div class="col-md-8 col-md-offset-2 text-center">
+      <h1>Breakfast in Long Beach</h1>
+    </div><!-- End Col -->
+  </div><!-- End Title Header Row -->
+
+  {% block body %}{% endblock %}
+  
+  <!-- Footer -->
+  <div class="row">
+    <div id="footer">Full Stack Web Developer Nanodegree<br />Project 3: Jeff Winters</div>
+  </div><!-- End Footer Row -->
+  
+</div><!-- End Container -->
+
+<!-- Bootstrap Core Scripts -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+<!-- Mozilla Persona Scripts -->
+<script src="https://login.persona.org/include.js"></script>
+<script type="text/javascript">
+  // code from https://github.com/mozilla/browserid-cookbook
+  var App = {
+    init: function(){
+      function verifyAssertion(assertion) {
+        $.post('/auth/login', {assertion: assertion}, function (data, textStatus) {
+          if ('success' == textStatus) {
+            window.location.reload();
+          } else {
+            navigator.id.logout();
+          }
+        }, 'json');
+      }
+       
+      function signoutUser() {
+        $.post('/auth/logout', {}, function (data) {
+          window.location.reload();
+        });
+      }
+      navigator.id.watch( {
+        {% if session.email %}
+          loggedInUser: '{{ session.email }}',
+        {% else %}
+          loggedInUser: null,
+        {% endif %}
+          onlogin: verifyAssertion,
+          onlogout: signoutUser
+      });
+      
+      $("#signin").click(function(){
+        navigator.id.request();
+      });
+
+      $("#signout").click(function(){
+        navigator.id.logout();
+      });
+    }
+  }
+  $(document).ready(function(){
+    App.init();
+  });
+</script>
+
+  {% block more_scripts %}{% endblock %}
+  
+</body>
+</html>
