@@ -1,0 +1,77 @@
+{% extends "shared_layout.html" %}
+{% block body %}
+  <!-- Subtitle -->
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3 text-center divider">
+      <h2><i class="fa fa-cutlery"></i>&nbsp;Breakfast in LB: <span class="lb-subhead">Restaurant List</span></h2>
+      <div class="text-right">
+        {% if session.email %}
+        <a class="btn btn-sm btn-primary" href="{{url_for('newRestaurant')}}">Add New</a>
+        {% endif %}
+      </div>
+    </div>
+  </div><!-- End Subtitle Row -->
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %} 
+  <!-- Messages -->
+  <div class="row">
+    <div class = "col-md-6 col-md-offset-3">
+      {% for message in messages %}
+      <p class = "flash"><i class="fa fa-check-circle-o"></i> {{ message }}</p>
+      {% endfor %}
+    </div>
+  </div><!-- End Messages Row -->
+      {% endif %}
+  {% endwith %}
+
+  <!-- Display Restaurants -->
+  <div class="row">
+{% for item in items %}
+    <div class="col-sm-6 col-md-4">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <div class = 'lbr-name'>
+            <a href="{{url_for('restaurantMenu',restaurant_id = item.id)}}">{{item.name}}</a>
+          </div>
+          <div class = 'lbr-category'>
+            {{item.category}}
+          </div>
+          {% if item.rating %}
+          <div class = 'lbr-rating'>
+            {% for n in range(5) %}
+              {% if item.rating > n %} <i class="fa fa-star"></i> 
+              {% else %} <i class="fa fa-star-o"></i> 
+              {% endif %}
+            {% endfor %}
+          </div>
+          {% endif %}
+          {% if item.price_range %}
+          <div class = 'lbr-rating'>
+            {% for n in range(item.price_range) %}
+              <i class="fa fa-usd"></i>
+            {% endfor %}
+          </div>
+          {% endif %}
+          <div class = 'lbr-item-image'>
+            <img src="{{item.image_url}}" alt="" class="img-responsive img-thumbnail" />
+          </div>
+          <div class = 'lbr-description'>
+            <p>{{item.description}}</p>
+          </div>
+         {% if session.email %}
+          <div class="text-right">
+            <a class="btn btn-sm btn-primary" href="{{url_for('editRestaurant',restaurant_id = item.id)}}" >Edit</a>
+            <a class="btn btn-sm btn-danger" href="{{url_for('deleteRestaurant', restaurant_id = item.id)}}" >Delete</a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div><!-- End Col -->
+{% else %}
+    <div class="col-md-6 col-md-offset-3 text-center">
+      <p>There are currently no restaurants entered.</p>
+    </div>
+{% endfor %}
+  </div><!-- End Display Row -->
+{% endblock %}
